@@ -104,6 +104,74 @@ jobs:
    - Name: `BLOB_READ_WRITE_TOKEN`
    - Value: Your Vercel Blob token
 
+## Development
+
+This action is built with TypeScript and uses a build process to bundle all dependencies into a single JavaScript file. This means consumers don't need to install dependencies when using the action.
+
+### Prerequisites
+
+- Node.js 20 or later
+- npm or bun
+
+### Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/dartilesm/vercel-blob-action.git
+   cd vercel-blob-action
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   bun install
+   ```
+
+### Building
+
+The action uses TypeScript and needs to be built before it can be used:
+
+```bash
+npm run build
+# or
+bun run build
+```
+
+This command:
+
+1. Compiles TypeScript to JavaScript (`tsc`)
+2. Bundles all dependencies into a single file using `@vercel/ncc`
+3. Outputs the bundled file to `dist/index.js`
+
+### Development Workflow
+
+1. Make changes to `src/index.ts`
+2. Run `npm run build` to compile and bundle
+3. Test the action locally or in a workflow
+4. Commit both source and built files
+
+### Scripts
+
+- `npm run build` - Build the action for production
+- `npm run dev` - Watch mode for development (TypeScript compilation only)
+
+### Project Structure
+
+```
+├── src/
+│   └── index.ts          # Main action source code
+├── dist/
+│   ├── index.js          # Built and bundled action (committed)
+│   └── index.js.map      # Source map for debugging
+├── action.yml            # Action metadata
+├── package.json          # Dependencies and scripts
+└── tsconfig.json         # TypeScript configuration
+```
+
+**Note:** The `dist/` directory is committed to the repository because GitHub Actions need the built JavaScript file to run the action.
+
 ## License
 
 This project is licensed under the ISC License.
