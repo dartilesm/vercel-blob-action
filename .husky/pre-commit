@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Build the package to ensure dist files are up to date
 echo "🔨 Building package before commit..."
 npm run build
