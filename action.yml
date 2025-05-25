@@ -1,21 +1,41 @@
-name: "Vercel Blob Action"
-description: "A GitHub Action to interact with Vercel Blob storage"
+# GitHub Action Metadata File
+# This file defines the action's interface, inputs, outputs, and execution environment
+# Reference: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+
+# Action identification and description
+name: "Upload to Vercel Blob"
+description: "Upload files to Vercel Blob storage from GitHub Actions workflows"
+author: "dartilesm"
+
+# Input parameters that users can provide when using this action
 inputs:
+  # Source file path - the file to be uploaded
   source:
     description: "The source path for the blob file"
     required: true
+
+  # Destination path in Vercel Blob storage
   destination:
     description: "The destination path for the blob in Vercel Blob storage"
     required: true
+
+  # Vercel Blob read-write token for authentication
   read-write-token:
     description: "Vercel Blob read-write token (BLOB_READ_WRITE_TOKEN)"
     required: true
+
+# Output values that this action provides to subsequent workflow steps
 outputs:
+  # URL of the uploaded blob file
   url:
     description: "The URL of the uploaded blob"
+
+# Execution environment configuration
 runs:
-  using: "node20"
-  main: "src/index.js"
+  using: "node20" # Use Node.js 20 runtime
+  main: "src/index.js" # Entry point script
+
+# Visual branding for GitHub Marketplace
 branding:
-  icon: "cloud-upload"
-  color: "blue"
+  icon: "upload-cloud" # Feather icon name
+  color: "blue" # Theme color
