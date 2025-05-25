@@ -47,7 +47,9 @@ async function run(): Promise<void> {
 
     // Upload the file to Vercel Blob storage
     // The put() function handles the actual upload and returns metadata about the uploaded blob
-    const result = await put(destinationPath, fileStream);
+    const result = await put(destinationPath, fileStream, {
+      access: 'public'
+    });
 
     // Log successful upload and provide the blob URL
     core.info(`File uploaded successfully to ${result.url}`);
