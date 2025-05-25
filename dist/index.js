@@ -29029,17 +29029,14 @@ async function run() {
         const result = await put(destinationPath, fileStream, {
             access: 'public'
         });
-        // Log successful upload and provide the blob URL
-        core.info(`File uploaded successfully to ${result.url}`);
-        // Set the blob URL as an output that can be used by subsequent workflow steps
-        // Other steps can access this via: ${{ steps.step-id.outputs.url }}
-        core.setOutput('url', result.url);
+        // Log successful upload without exposing the URL
+        core.info('File uploaded successfully to Vercel Blob. Check your Vercel dashboard to access the file.');
     }
     catch (error) {
         // Handle any errors that occur during the upload process
         // This will mark the action as failed and display the error message in the workflow
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-        core.setFailed(`Action failed: ${errorMessage}`);
+        core.setFailed(errorMessage);
     }
 }
 // Execute the main function
