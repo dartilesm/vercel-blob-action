@@ -1,0 +1,21 @@
+name: "Vercel Blob Action"
+description: "A GitHub Action to interact with Vercel Blob storage"
+inputs:
+  source:
+    description: "The source path for the blob file"
+    required: true
+  destination:
+    description: "The destination path for the blob in Vercel Blob storage"
+    required: true
+  read-write-token:
+    description: "Vercel Blob read-write token (BLOB_READ_WRITE_TOKEN)"
+    required: true
+outputs:
+  url:
+    description: "The URL of the uploaded blob"
+runs:
+  using: "node20"
+  main: "src/index.js"
+branding:
+  icon: "cloud-upload"
+  color: "blue"
