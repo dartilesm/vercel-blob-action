@@ -45,19 +45,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: oven-sh/setup-bun@v2
+
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Build project
         run: |
           # Simulate a build process
           mkdir -p build
-          npm run build || echo "No build script found, creating sample build files"
+          bun run build || echo "No build script found, creating sample build files"
           echo "Built application at $(date)" > build/app.txt
           echo "Version: ${{ github.sha }}" >> build/app.txt
 
