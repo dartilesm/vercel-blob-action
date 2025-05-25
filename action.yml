@@ -1,0 +1,15 @@
+name: 'Vercel Blob Action'
+description: 'A GitHub Action to interact with Vercel Blob'
+inputs:
+  source:
+    description: 'The source path for the blob'
+    required: true
+  destination:
+    description: 'The destination path for the blob'
+    required: true
+runs:
+  using: 'node12'
+  main: 'src/index.js'
+branding:
+  icon: 'cloud-upload'
+  color: 'blue'
