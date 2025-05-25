@@ -9,14 +9,14 @@ author: "dartilesm"
 
 # Input parameters that users can provide when using this action
 inputs:
-  # Source file path - the file to be uploaded
+  # Source file or folder path - the file or folder to be uploaded
   source:
-    description: "The source path for the blob file"
+    description: "The source path for the blob file or folder"
     required: true
 
   # Destination path in Vercel Blob storage
   destination:
-    description: "The destination path for the blob in Vercel Blob storage"
+    description: "The destination path for the blob in Vercel Blob storage (for folders, this will be the base path)"
     required: true
 
   # Vercel Blob read-write token for authentication

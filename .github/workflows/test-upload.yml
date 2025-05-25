@@ -1,0 +1,99 @@
+name: Test Upload Functionality
+
+on: [push]
+
+jobs:
+  test-single-file:
+    runs-on: ubuntu-latest
+    name: Test Single File Upload
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create test file
+        run: |
+          echo "Test file created at $(date)" > test-file.txt
+          echo "GitHub SHA: ${{ github.sha }}" >> test-file.txt
+          echo "Workflow run: ${{ github.run_number }}" >> test-file.txt
+          echo "Test type: Single file upload" >> test-file.txt
+
+      - name: Upload single file to Vercel Blob
+        uses: ./
+        with:
+          source: "test-file.txt"
+          destination: "github-actions-test/single-file-${{ github.run_number }}.txt"
+          read-write-token: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+
+      - name: Cleanup
+        run: rm -f test-file.txt
+
+  test-folder-upload:
+    runs-on: ubuntu-latest
+    name: Test Folder Upload
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create test folder structure
+        run: |
+          mkdir -p test-folder/assets/css
+          mkdir -p test-folder/assets/js
+          mkdir -p test-folder/docs
+
+          # Create various files
+          echo "<!DOCTYPE html><html><head><title>Test</title></head><body><h1>Test Page</h1></body></html>" > test-folder/index.html
+          echo "body { font-family: Arial, sans-serif; }" > test-folder/assets/css/style.css
+          echo "console.log('Hello from test!');" > test-folder/assets/js/script.js
+          echo "# Test Documentation" > test-folder/docs/README.md
+          echo "This is a test file created at $(date)" > test-folder/docs/info.txt
+
+          # Create a nested structure
+          mkdir -p test-folder/assets/images
+          echo "Fake image data" > test-folder/assets/images/logo.txt
+
+          echo "Created test folder structure:"
+          find test-folder -type f
+
+      - name: Upload entire folder to Vercel Blob
+        uses: ./
+        with:
+          source: "test-folder/"
+          destination: "github-actions-test/folder-upload-${{ github.run_number }}"
+          read-write-token: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+
+      - name: Cleanup
+        run: rm -rf test-folder
+
+  test-results:
+    runs-on: ubuntu-latest
+    name: Test Results Summary
+    needs: [test-single-file, test-folder-upload]
+    if: always()
+
+    steps:
+      - name: Summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Single File Upload" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-single-file.result }}" == "success" ]; then
+            echo "✅ **PASSED** - Single file upload completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **FAILED** - Single file upload failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Folder Upload" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.test-folder-upload.result }}" == "success" ]; then
+            echo "✅ **PASSED** - Folder upload completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **FAILED** - Folder upload failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Access Files" >> $GITHUB_STEP_SUMMARY
+          echo "Check your [Vercel Dashboard](https://vercel.com/dashboard) under Storage → Blob to access the uploaded files." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Files uploaded:**" >> $GITHUB_STEP_SUMMARY
+          echo "- \`github-actions-test/single-file-${{ github.run_number }}.txt\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`github-actions-test/folder-upload-${{ github.run_number }}/\` (folder with multiple files)" >> $GITHUB_STEP_SUMMARY
