@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Build the package to ensure dist files are up to date
+echo "🔨 Building package before commit..."
+npm run build
+
+# Stage the built files
+echo "📦 Staging built files..."
+git add dist/
+
+echo "✅ Pre-commit build completed!"

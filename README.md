@@ -148,9 +148,10 @@ This command:
 ### Development Workflow
 
 1. Make changes to `src/index.ts`
-2. Run `npm run build` to compile and bundle
+2. Commit your changes (the pre-commit hook will automatically build and stage the dist files)
 3. Test the action locally or in a workflow
-4. Commit both source and built files
+
+**Note:** A pre-commit hook automatically runs `npm run build` and stages the built files, ensuring the `dist/` directory is always in sync with your source code.
 
 ### Scripts
 

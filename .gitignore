@@ -10,3 +10,6 @@ yarn-error.log*
 
 # Keep dist/ tracked for GitHub Actions
 # dist/
+
+# Husky
+.husky/_

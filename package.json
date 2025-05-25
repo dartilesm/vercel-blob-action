@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc && ncc build dist/index.js -o dist --source-map",
     "dev": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
   "keywords": [
     "github-action",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@vercel/ncc": "^0.38.1",
+    "husky": "^9.0.0",
     "typescript": "^5.0.0"
   }
 }
