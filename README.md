@@ -89,15 +89,6 @@ jobs:
         run: echo "File uploaded to ${{ steps.upload.outputs.url }}"
 ```
 
-## More Examples
-
-For additional workflow examples and advanced use cases, visit the [examples repository](https://github.com/dartilesm/vercel-blob-action-examples) which includes:
-
-- Multiple file upload scenarios
-- Conditional uploads with manual triggers
-- Error handling patterns
-- Integration with different build systems
-
 ## Setting up the Token
 
 1. **Get your Vercel Blob token:**
