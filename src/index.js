@@ -1,31 +1,28 @@
-const core = require('@actions/core');
-const axios = require('axios');
+import * as core from '@actions/core';
+import fs from 'fs';
+import { put } from '@vercel/blob';
 
 async function run() {
-    try {
-        const sourcePath = core.getInput('source');
-        const destinationPath = core.getInput('destination');
+  try {
+    const sourcePath = core.getInput('source', { required: true });
+    const destinationPath = core.getInput('destination', { required: true });
+    const token = core.getInput('vercelToken', { required: true });
 
-        if (!sourcePath || !destinationPath) {
-            throw new Error('Both source and destination paths are required.');
-        }
-
-        // Here you would add the logic to interact with the Vercel Blob API
-        // For example, uploading a file from sourcePath to destinationPath
-
-        core.info(`Source Path: ${sourcePath}`);
-        core.info(`Destination Path: ${destinationPath}`);
-
-        // Simulate API interaction
-        const response = await axios.post('https://api.vercel.com/v1/blob', {
-            source: sourcePath,
-            destination: destinationPath
-        });
-
-        core.setOutput('response', response.data);
-    } catch (error) {
-        core.setFailed(error.message);
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error(`Source file does not exist: ${sourcePath}`);
     }
+
+    const fileStream = fs.createReadStream(sourcePath);
+
+    const result = await put(destinationPath, fileStream, {
+      token,
+    });
+
+    core.info(`File uploaded to ${result.url}`);
+    core.setOutput('url', result.url);
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
 
 run();
