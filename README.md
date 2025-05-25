@@ -1,4 +1,4 @@
-# Vercel Blob Action
+# Upload to Vercel Blob
 
 This GitHub Action allows you to upload files to Vercel Blob storage by specifying a source file and destination path. It provides an easy way to manage blob storage in your Vercel projects through GitHub Actions workflows.
 
@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Upload file to Vercel Blob
-        uses: your-username/vercel-blob-action@v1
+        uses: dartilesm/vercel-blob-action@v1
         with:
           source: "path/to/your/file.txt"
           destination: "uploads/file.txt"
@@ -79,7 +79,7 @@ jobs:
           echo "Built file" > dist/output.txt
 
       - name: Upload to Vercel Blob
-        uses: your-username/vercel-blob-action@v1
+        uses: dartilesm/vercel-blob-action@v1
         with:
           source: "dist/output.txt"
           destination: "builds/output-${{ github.sha }}.txt"
@@ -88,6 +88,15 @@ jobs:
       - name: Display blob URL
         run: echo "File uploaded to ${{ steps.upload.outputs.url }}"
 ```
+
+## More Examples
+
+For additional workflow examples and advanced use cases, visit the [examples repository](https://github.com/dartilesm/vercel-blob-action-examples) which includes:
+
+- Multiple file upload scenarios
+- Conditional uploads with manual triggers
+- Error handling patterns
+- Integration with different build systems
 
 ## Setting up the Token
 

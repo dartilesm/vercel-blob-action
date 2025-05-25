@@ -1,5 +1,6 @@
-name: "Vercel Blob Action"
-description: "A GitHub Action to interact with Vercel Blob storage"
+name: "Upload to Vercel Blob"
+description: "Upload files to Vercel Blob storage from GitHub Actions workflows"
+author: "dartilesm"
 inputs:
   source:
     description: "The source path for the blob file"
