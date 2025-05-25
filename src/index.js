@@ -23,7 +23,9 @@ async function run() {
     // Set the token as an environment variable for the Vercel Blob SDK
     process.env.BLOB_READ_WRITE_TOKEN = token;
 
-    const result = await put(destinationPath, fileStream);
+    const result = await put(destinationPath, fileStream, {
+      access: 'public'
+    });
 
     core.info(`File uploaded successfully to ${result.url}`);
     core.setOutput('url', result.url);
