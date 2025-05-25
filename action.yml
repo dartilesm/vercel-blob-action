@@ -33,7 +33,7 @@ outputs:
 # Execution environment configuration
 runs:
   using: "node20" # Use Node.js 20 runtime
-  main: "src/index.js" # Entry point script
+  main: "dist/index.js" # Entry point script
 
 # Visual branding for GitHub Marketplace
 branding:

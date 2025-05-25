@@ -14,7 +14,7 @@ import { put } from '@vercel/blob';     // Vercel Blob SDK for uploading files
  * Main function that executes the action
  * Handles file upload to Vercel Blob storage with proper error handling
  */
-async function run() {
+async function run(): Promise<void> {
   try {
     // Get input parameters from the GitHub Action workflow
     // These are defined in action.yml and passed from the workflow file
@@ -47,22 +47,21 @@ async function run() {
 
     // Upload the file to Vercel Blob storage
     // The put() function handles the actual upload and returns metadata about the uploaded blob
-    const result = await put(destinationPath, fileStream);
+    const result = await put(destinationPath, fileStream, {
+      access: 'public'
+    });
 
-    // Log successful upload and provide the blob URL
-    core.info(`File uploaded successfully to ${result.url}`);
-
-    // Set the blob URL as an output that can be used by subsequent workflow steps
-    // Other steps can access this via: ${{ steps.step-id.outputs.url }}
-    core.setOutput('url', result.url);
+    // Log successful upload without exposing the URL
+    core.info('File uploaded successfully to Vercel Blob. Check your Vercel dashboard to access the file.');
 
   } catch (error) {
     // Handle any errors that occur during the upload process
     // This will mark the action as failed and display the error message in the workflow
-    core.setFailed(`Action failed: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    core.setFailed(errorMessage);
   }
 }
 
 // Execute the main function
 // This is the entry point when the action runs
-run();
+run(); 
