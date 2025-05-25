@@ -8,11 +8,51 @@
 // Import required modules
 import * as core from '@actions/core';  // GitHub Actions toolkit for inputs, outputs, and logging
 import fs from 'fs';                    // Node.js file system module for file operations
+import path from 'path';                // Node.js path module for path operations
 import { put } from '@vercel/blob';     // Vercel Blob SDK for uploading files
 
 /**
+ * Recursively gets all files in a directory
+ * @param dirPath - Directory path to scan
+ * @param fileList - Array to store file paths (used for recursion)
+ * @returns Array of file paths
+ */
+function getAllFiles(dirPath: string, fileList: string[] = []): string[] {
+  const files = fs.readdirSync(dirPath);
+
+  files.forEach(file => {
+    const filePath = path.join(dirPath, file);
+    const stat = fs.statSync(filePath);
+
+    if (stat.isDirectory()) {
+      // Recursively get files from subdirectories
+      getAllFiles(filePath, fileList);
+    } else {
+      // Add file to the list
+      fileList.push(filePath);
+    }
+  });
+
+  return fileList;
+}
+
+/**
+ * Uploads a single file to Vercel Blob storage
+ * @param filePath - Path to the file to upload
+ * @param destinationPath - Destination path in Vercel Blob storage
+ * @returns Promise resolving to the upload result
+ */
+async function uploadFile(filePath: string, destinationPath: string): Promise<void> {
+  const fileStream = fs.createReadStream(filePath);
+  
+  await put(destinationPath, fileStream, {
+    access: 'public'
+  });
+}
+
+/**
  * Main function that executes the action
- * Handles file upload to Vercel Blob storage with proper error handling
+ * Handles file or folder upload to Vercel Blob storage with proper error handling
  */
 async function run(): Promise<void> {
   try {
@@ -28,31 +68,56 @@ async function run(): Promise<void> {
       throw new Error('Vercel Blob read-write token is required. Please set the read-write-token input with your BLOB_READ_WRITE_TOKEN.');
     }
 
-    // Check if the source file exists before attempting upload
+    // Check if the source path exists before attempting upload
     // This prevents unnecessary API calls and provides clear error messages
     if (!fs.existsSync(sourcePath)) {
-      throw new Error(`Source file does not exist: ${sourcePath}`);
+      throw new Error(`Source path does not exist: ${sourcePath}`);
     }
-
-    // Log the upload operation for debugging and monitoring
-    core.info(`Uploading file from ${sourcePath} to ${destinationPath}`);
-
-    // Create a readable stream from the source file
-    // Streaming is more memory-efficient for large files
-    const fileStream = fs.createReadStream(sourcePath);
 
     // Set the token as an environment variable for the Vercel Blob SDK
     // The SDK automatically reads BLOB_READ_WRITE_TOKEN from environment variables
     process.env.BLOB_READ_WRITE_TOKEN = token;
 
-    // Upload the file to Vercel Blob storage
-    // The put() function handles the actual upload and returns metadata about the uploaded blob
-    const result = await put(destinationPath, fileStream, {
-      access: 'public'
-    });
+    const stat = fs.statSync(sourcePath);
 
-    // Log successful upload without exposing the URL
-    core.info('File uploaded successfully to Vercel Blob. Check your Vercel dashboard to access the file.');
+    // Handle single file upload
+    if (stat.isFile()) {
+      core.info(`Uploading file from ${sourcePath} to ${destinationPath}`);
+      await uploadFile(sourcePath, destinationPath);
+      core.info('File uploaded successfully to Vercel Blob. Check your Vercel dashboard to access the file.');
+      return;
+    }
+
+    // Handle folder upload
+    if (stat.isDirectory()) {
+      core.info(`Uploading folder from ${sourcePath} to ${destinationPath}`);
+      
+      const files = getAllFiles(sourcePath);
+      
+      if (files.length === 0) {
+        core.warning('No files found in the specified directory.');
+        return;
+      }
+
+      core.info(`Found ${files.length} files to upload`);
+
+      // Upload each file
+      for (const filePath of files) {
+        // Calculate relative path from source directory
+        const relativePath = path.relative(sourcePath, filePath);
+        // Create destination path by joining the destination with the relative path
+        const fileDestination = path.posix.join(destinationPath, relativePath);
+        
+        core.info(`Uploading: ${relativePath} → ${fileDestination}`);
+        await uploadFile(filePath, fileDestination);
+      }
+
+      core.info(`Successfully uploaded ${files.length} files to Vercel Blob. Check your Vercel dashboard to access the files.`);
+      return;
+    }
+
+    // If neither file nor directory, throw error
+    throw new Error(`Source path is neither a file nor a directory: ${sourcePath}`);
 
   } catch (error) {
     // Handle any errors that occur during the upload process

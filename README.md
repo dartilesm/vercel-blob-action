@@ -1,16 +1,22 @@
 # Upload to Vercel Blob
 
-This GitHub Action allows you to upload files to Vercel Blob storage by specifying a source file and destination path. It provides an easy way to manage blob storage in your Vercel projects through GitHub Actions workflows.
+This GitHub Action allows you to upload files or entire folders to Vercel Blob storage by specifying a source path and destination path. It provides an easy way to manage blob storage in your Vercel projects through GitHub Actions workflows.
 
 ## Inputs
 
 ### `source`
 
-**Required** The source path of the file you want to upload to Vercel Blob storage.
+**Required** The source path of the file or folder you want to upload to Vercel Blob storage.
+
+- **File**: Upload a single file
+- **Folder**: Upload all files within the folder (including subdirectories)
 
 ### `destination`
 
-**Required** The destination path where the file should be stored in Vercel Blob storage.
+**Required** The destination path where the file(s) should be stored in Vercel Blob storage.
+
+- **For files**: The exact destination path for the file
+- **For folders**: The base path where all files will be uploaded (maintaining folder structure)
 
 ### `read-write-token`
 
@@ -18,9 +24,7 @@ This GitHub Action allows you to upload files to Vercel Blob storage by specifyi
 
 ## Outputs
 
-### `url`
-
-The URL of the uploaded blob file.
+This action does not provide any outputs for privacy and security reasons. To access your uploaded files, check your Vercel dashboard under Storage → Blob.
 
 ## Environment Variables
 
@@ -33,34 +37,38 @@ This action requires a Vercel Blob read-write token. The action will automatical
 
 ## Usage
 
-To use this action in your workflow, add it as a step in your GitHub Actions workflow file:
+### Single File Upload
+
+Upload a single file to Vercel Blob storage:
 
 ```yaml
-name: Upload to Vercel Blob
+name: Upload Single File
 
-on: [push]
+on:
+  push:
+    branches: [main]
 
 jobs:
-  upload_blob:
+  upload-file:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Upload file to Vercel Blob
-        uses: dartilesm/vercel-blob-action@v1
+        uses: dartilesm/vercel-blob-action@v2
         with:
-          source: "path/to/your/file.txt"
+          source: "path/to/file.txt"
           destination: "uploads/file.txt"
           read-write-token: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
 ```
 
-## Example
+### Folder Upload
 
-Here's a complete example that uploads a build artifact to Vercel Blob storage:
+Upload an entire folder (including subdirectories) to Vercel Blob storage:
 
 ```yaml
-name: Build and Upload
+name: Upload Build Folder
 
 on:
   push:
@@ -76,18 +84,24 @@ jobs:
       - name: Build project
         run: |
           # Your build commands here
-          echo "Built file" > dist/output.txt
+          mkdir -p dist/assets
+          echo "Main file" > dist/index.html
+          echo "Stylesheet" > dist/assets/style.css
+          echo "Script" > dist/assets/script.js
 
-      - name: Upload to Vercel Blob
-        uses: dartilesm/vercel-blob-action@v1
+      - name: Upload entire build folder to Vercel Blob
+        uses: dartilesm/vercel-blob-action@v2
         with:
-          source: "dist/output.txt"
-          destination: "builds/output-${{ github.sha }}.txt"
+          source: "dist/"
+          destination: "builds/${{ github.sha }}"
           read-write-token: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-
-      - name: Display blob URL
-        run: echo "File uploaded to ${{ steps.upload.outputs.url }}"
 ```
+
+This will upload all files maintaining the folder structure:
+
+- `dist/index.html` → `builds/{sha}/index.html`
+- `dist/assets/style.css` → `builds/{sha}/assets/style.css`
+- `dist/assets/script.js` → `builds/{sha}/assets/script.js`
 
 ## Setting up the Token
 
