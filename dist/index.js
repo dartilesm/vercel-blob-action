@@ -29026,7 +29026,9 @@ async function run() {
         process.env.BLOB_READ_WRITE_TOKEN = token;
         // Upload the file to Vercel Blob storage
         // The put() function handles the actual upload and returns metadata about the uploaded blob
-        const result = await put(destinationPath, fileStream);
+        const result = await put(destinationPath, fileStream, {
+            access: 'public'
+        });
         // Log successful upload and provide the blob URL
         core.info(`File uploaded successfully to ${result.url}`);
         // Set the blob URL as an output that can be used by subsequent workflow steps
